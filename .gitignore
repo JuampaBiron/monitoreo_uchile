@@ -1,0 +1,24 @@
+# Ambiente virtual y Python
+venv/
+env/
+*.pyc
+__pycache__/
+
+# Archivos de credenciales
+.env
+
+# Archivos generados (excepto los de input)
+/process_data/*.csv
+/process_data/*.xlsx
+
+# Chrome webdriver logs
+*.log
+
+# IDEs y editores
+.vscode/
+.idea/
+*.swp
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
