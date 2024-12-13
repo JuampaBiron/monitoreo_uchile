@@ -1,7 +1,7 @@
 import logging
 import pandas as pd
 from openpyxl import load_workbook
-
+from config import Config
 # Configuración del logger
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -9,9 +9,8 @@ logging.basicConfig(level=logging.INFO,
 class GenerateFinalReport:
     def __init__(self):
         self.logger = logging.getLogger(self.__class__.__name__)
-        self.profesores_dictionary = "process_data/profesores.xlsx"
-        self.estudiantes = "process_data/estudiantes_postgrados.xlsx"
-        self.estudiantes_postgrado = "process_data/estudiantes_postgrado.xlsx"
+        self.profesores_dictionary = Config.PROFESORES
+        self.estudiantes = Config.ESTUDIANTES
 
     def match_files(self):
         logging.info("Iniciando la carga de archivos Excel.")

@@ -40,12 +40,6 @@ class BuildWorktray:
         logging.info(f"Profesores copiado correctamente en process data.")
         shutil.copyfile(src=self.template_estudiantes, dst=self.estudiantes)
         logging.info(f"estudiantes_postgrado copiado correctamente en process data.")
-        """
-        # Concat memory into worktray
-        df_memory = pd.read_excel(self.memory_file)
-        df_worktray = pd.read_excel(self.worktray_path)
-        df_merged = pd.concat([df_memory, df_worktray], ignore_index=True)
-        df_merged.to_excel(self.worktray_path,sheet_name="base",index=False)"""
 
 
 if __name__ == "__main__":
