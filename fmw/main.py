@@ -4,7 +4,7 @@ from enum import Enum
 from config import Config
 from build_worktray import BuildWorktray
 from s1_download_students_list import UcampusEstudiantesPostgrado
-from s2_ucampus_get_estudiantes import UcampusGetEstudiantesRegulares  
+from fmw.s2_build_regulares_graduados_file import UcampusEstudiantesManager  
 
 # Configuración del logger
 logging.basicConfig(
@@ -13,9 +13,9 @@ logging.basicConfig(
 )
 
 class State(Enum):
-    BUILD_WORKTRAY = 0
-    DOWNLOAD_STUDENTS = 1
-    GET_ESTUDIANTES = 2
+    GET_DATABASE_INFO = 0
+    DOWNLOAD_STUDENTS_CSV = 1
+    GET_ESTUDIANTES_INFO_FROM_BIA = 2
 
 class Robot:
     def __init__(self, start_state: int, final_state: int):
@@ -35,7 +35,7 @@ class Robot:
                 elif self.state == State.DOWNLOAD_STUDENTS.value:
                     UcampusEstudiantesPostgrado().run_workflow()
                 elif self.state == State.GET_ESTUDIANTES.value:
-                    UcampusGetEstudiantesRegulares().run_workflow()
+                    UcampusEstudiantesManager().run_workflow()
                 else:
                     self.logger.warning(f"Estado {self.state} no implementado")
                 

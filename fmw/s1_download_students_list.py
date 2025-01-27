@@ -15,6 +15,19 @@ logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 class UcampusEstudiantesPostgrado:
+    """
+    Clase que automatiza la extracción de datos de estudiantes de postgrado desde Ucampus.
+    
+    Esta clase maneja la autenticación, navegación y descarga de datos de estudiantes
+    utilizando Selenium WebDriver y requests.
+    
+    Attributes:
+        url (str): URL base de Ucampus
+        keep_web_alive (bool): Controla si la conexión del WebDriver se mantiene activa
+        user (str): Usuario de Ucampus obtenido de variables de entorno
+        password (str): Contraseña de Ucampus obtenida de variables de entorno
+        students_csv_file (str): Ruta donde se guardará el archivo CSV de estudiantes
+    """
     def __init__(self, keep_web_alive=True):
         load_dotenv()
         self.url = Config.BASE_URL
@@ -31,6 +44,12 @@ class UcampusEstudiantesPostgrado:
         os.makedirs(os.path.dirname(self.students_csv_file), exist_ok=True)
 
     def _setup_driver(self):
+        """
+        Configura y retorna una instancia de Chrome WebDriver con opciones personalizadas.
+        
+        Returns:
+            webdriver.Chrome: Instancia configurada del WebDriver de Chrome en modo headless
+        """
         chrome_options = Options()
         chrome_options.add_argument('--disable-gpu')
         chrome_options.add_argument('--headless=new') 
@@ -46,6 +65,11 @@ class UcampusEstudiantesPostgrado:
         return webdriver.Chrome(options=chrome_options, keep_alive=self.keep_web_alive)
     
     def close(self):
+        """
+        Cierra la instancia del WebDriver y libera los recursos.
+        
+        Intenta un cierre normal y, si falla, fuerza el cierre del driver.
+        """
         try:
             if self.driver:
                 self.driver.quit()
@@ -61,6 +85,11 @@ class UcampusEstudiantesPostgrado:
                 pass
     
     def log_in(self):
+        """
+        Realiza el proceso de inicio de sesión en Ucampus.
+        
+        Navega a la página de login, ingresa las credenciales y envía el formulario.
+        """
         self.driver.get(self.url)
         self.driver.maximize_window()
         logging.info(f"Página cargada: {self.url}")
@@ -73,12 +102,27 @@ class UcampusEstudiantesPostgrado:
         self.driver.find_element(*btn_ingresar).click()
     
     def get_cookies(self):
+        """
+        Obtiene las cookies de la sesión actual del WebDriver.
+        
+        Returns:
+            str: Cookies formateadas como string para su uso en requests
+        """
         selenium_cookies = self.driver.get_cookies()
         # Convertir las cookies a formato string para requests
         cookies_str = '; '.join([f"{cookie['name']}={cookie['value']}" for cookie in selenium_cookies])
         return cookies_str
     
     def get_csrf_token(self, cookies):
+        """
+        Obtiene el token CSRF necesario para las operaciones seguras.
+        
+        Args:
+            cookies (str): String de cookies de la sesión activa
+            
+        Returns:
+            str or None: Token CSRF si se encuentra, None en caso contrario
+        """
         try:
             url = self.url + Config.CSRF_ENDPOINT
             params = {
@@ -105,6 +149,13 @@ class UcampusEstudiantesPostgrado:
             return None
         
     def download_students_csv(self, cookies, csrf):
+        """
+        Descarga el archivo CSV con la información de estudiantes.
+        
+        Args:
+            cookies (str): String de cookies de la sesión activa
+            csrf (str): Token CSRF para la petición
+        """
         logging.info("Iniciando descarga de archivo CSV")
         url = self.url + Config.CSRF_ENDPOINT
         params = {
@@ -136,6 +187,16 @@ class UcampusEstudiantesPostgrado:
                    
     
     def run_workflow(self):
+        """
+        Ejecuta la secuencia completa de extracción de datos.
+        
+        Este método orquesta todo el proceso:
+        1. Verificación de credenciales
+        2. Inicio de sesión
+        3. Obtención de tokens y cookies
+        4. Descarga del archivo CSV
+        5. Limpieza de recursos
+        """
         logging.info(f"************ Inicio del workflow {self.__class__.__name__} ************")
         try:
             if not self.user or not self.password:
